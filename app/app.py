@@ -69,3 +69,10 @@ def create_post(post: PostCreate) -> PostResponse:
     text_posts[max(text_posts.keys()) + 1] = new_post
     return new_post
 
+@app.delete("/posts/{post_id}")
+def delete_post(id: int):
+    if id not in text_posts:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    del text_posts[id]
+

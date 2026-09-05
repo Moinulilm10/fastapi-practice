@@ -1,2 +1,1 @@
-def main() -> None:
-    print("Hello from fast-api-practice!")
+"""FastAPI application package."""

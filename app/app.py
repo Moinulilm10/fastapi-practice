@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from app.schemas import PostCreate,PostResponse
+from app.schemas import PostCreate, PostResponse
 
 
 
@@ -56,17 +56,18 @@ def get_all_posts(limit: int = None):
     return text_posts
 
 @app.get("/posts/{post_id}")
-def get_post_by_id(id: int) -> PostResponse:
-    if id not in text_posts:
+def get_post_by_id(post_id: int) -> PostResponse:
+    if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    return text_posts.get(id)
+    return text_posts[post_id]
 
 
 @app.post("/posts")
 def create_post(post: PostCreate) -> PostResponse:
     new_post = {"title": post.title, "content": post.content}
     text_posts[max(text_posts.keys()) + 1] = new_post
+
     return new_post
 
 @app.delete("/posts/{post_id}")
@@ -76,3 +77,12 @@ def delete_post(id: int):
 
     del text_posts[id]
 
+
+@app.put("/posts/{post_id}")
+def update_post(post_id: int, post: PostCreate) -> PostResponse:
+    if post_id not in text_posts:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    updated_post = {"title": post.title, "content": post.content}
+    text_posts[post_id] = updated_post
+    return updated_post

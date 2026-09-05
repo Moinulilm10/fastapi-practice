@@ -9,3 +9,9 @@ class PostCreate(BaseModel):
 class PostResponse(BaseModel):
     title: str
     content: str
+
+
+class ApiResponse(BaseModel):
+    status_code: int
+    message: str
+    data: PostResponse | dict[int, PostResponse] | list[PostResponse] | None = None

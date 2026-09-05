@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException
-from app.schemas import PostCreate, PostResponse
+from app.schemas import ApiResponse, PostCreate, PostResponse
 
 
 
@@ -48,41 +48,64 @@ text_posts = {
     },
 }
 
-@app.get("/posts")
+@app.get("/posts", response_model=ApiResponse, status_code=200)
 def get_all_posts(limit: int = None):
     if limit:
-        return list(text_posts.values())[:limit]
+        posts = list(text_posts.values())[:limit]
+    else:
+        posts = text_posts
 
-    return text_posts
+    return {
+        "status_code": 200,
+        "message": "Posts retrieved successfully",
+        "data": posts,
+    }
 
-@app.get("/posts/{post_id}")
-def get_post_by_id(post_id: int) -> PostResponse:
+@app.get("/posts/{post_id}", response_model=ApiResponse, status_code=200)
+def get_post_by_id(post_id: int):
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    return text_posts[post_id]
+    return {
+        "status_code": 200,
+        "message": "Post retrieved successfully",
+        "data": text_posts[post_id],
+    }
 
 
-@app.post("/posts")
-def create_post(post: PostCreate) -> PostResponse:
+@app.post("/posts", response_model=ApiResponse, status_code=201)
+def create_post(post: PostCreate):
     new_post = {"title": post.title, "content": post.content}
     text_posts[max(text_posts.keys()) + 1] = new_post
 
-    return new_post
+    return {
+        "status_code": 201,
+        "message": "Post created successfully",
+        "data": new_post,
+    }
 
-@app.delete("/posts/{post_id}")
-def delete_post(id: int):
-    if id not in text_posts:
+@app.delete("/posts/{post_id}", response_model=ApiResponse, status_code=200)
+def delete_post(post_id: int):
+    if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    del text_posts[id]
+    del text_posts[post_id]
+    return {
+        "status_code": 200,
+        "message": "Post deleted successfully",
+        "data": None,
+    }
 
 
-@app.put("/posts/{post_id}")
-def update_post(post_id: int, post: PostCreate) -> PostResponse:
+@app.put("/posts/{post_id}", response_model=ApiResponse, status_code=200)
+def update_post(post_id: int, post: PostCreate):
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
     updated_post = {"title": post.title, "content": post.content}
     text_posts[post_id] = updated_post
-    return updated_post
+    return {
+        "status_code": 200,
+        "message": "Post updated successfully",
+        "data": updated_post,
+    }

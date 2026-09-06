@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from app.schemas import ApiResponse, PostCreate, PostResponse
 
 
@@ -49,8 +49,8 @@ text_posts = {
 }
 
 @app.get("/posts", response_model=ApiResponse, status_code=200)
-def get_all_posts(limit: int = None):
-    if limit:
+def get_all_posts(limit: int | None = Query(default=None, ge=0)):
+    if limit is not None:
         posts = list(text_posts.values())[:limit]
     else:
         posts = text_posts

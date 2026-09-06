@@ -109,3 +109,20 @@ def update_post(post_id: int, post: PostCreate):
         "message": "Post updated successfully",
         "data": updated_post,
     }
+
+@app.patch("/posts/{post_id}", response_model=ApiResponse, status_code=200)
+def partial_update_post(post_id: int, post: PostCreate):
+    if post_id not in text_posts:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    existing_post = text_posts[post_id]
+    updated_post = {
+        "title": post.title if post.title else existing_post["title"],
+        "content": post.content if post.content else existing_post["content"]
+    }
+    text_posts[post_id] = updated_post
+    return {
+        "status_code": 200,
+        "message": "Post partially updated successfully",
+        "data": updated_post,
+    }

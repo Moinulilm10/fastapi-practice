@@ -1,9 +1,21 @@
+"""FastAPI routes and application setup."""
+
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException, Query
-from app.schemas import ApiResponse, PostCreate, PostResponse
+
+from app.db.db import create_db_and_tables
+from app.schemas import ApiResponse, PostCreate
 
 
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    """Create database tables when the application starts."""
+    await create_db_and_tables()
+    yield
 
-app = FastAPI()
+
+app = FastAPI(lifespan=lifespan)
 
 text_posts = {
     1: {
@@ -48,8 +60,10 @@ text_posts = {
     },
 }
 
+
 @app.get("/posts", response_model=ApiResponse, status_code=200)
-def get_all_posts(limit: int | None = Query(default=None, ge=0)):
+def get_all_posts(limit: int | None = Query(default=None, ge=0)) -> dict[str, object]:
+    """Return all posts, optionally limited to the requested count."""
     if limit is not None:
         posts = list(text_posts.values())[:limit]
     else:
@@ -61,8 +75,10 @@ def get_all_posts(limit: int | None = Query(default=None, ge=0)):
         "data": posts,
     }
 
+
 @app.get("/posts/{post_id}", response_model=ApiResponse, status_code=200)
-def get_post_by_id(post_id: int):
+def get_post_by_id(post_id: int) -> dict[str, object]:
+    """Return a post by its identifier."""
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -74,7 +90,8 @@ def get_post_by_id(post_id: int):
 
 
 @app.post("/posts", response_model=ApiResponse, status_code=201)
-def create_post(post: PostCreate):
+def create_post(post: PostCreate) -> dict[str, object]:
+    """Create and return a new post."""
     new_post = {"title": post.title, "content": post.content}
     text_posts[max(text_posts.keys()) + 1] = new_post
 
@@ -84,8 +101,10 @@ def create_post(post: PostCreate):
         "data": new_post,
     }
 
+
 @app.delete("/posts/{post_id}", response_model=ApiResponse, status_code=200)
-def delete_post(post_id: int):
+def delete_post(post_id: int) -> dict[str, object]:
+    """Delete a post by its identifier."""
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -98,7 +117,8 @@ def delete_post(post_id: int):
 
 
 @app.put("/posts/{post_id}", response_model=ApiResponse, status_code=200)
-def update_post(post_id: int, post: PostCreate):
+def update_post(post_id: int, post: PostCreate) -> dict[str, object]:
+    """Replace and return an existing post."""
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
@@ -110,15 +130,17 @@ def update_post(post_id: int, post: PostCreate):
         "data": updated_post,
     }
 
+
 @app.patch("/posts/{post_id}", response_model=ApiResponse, status_code=200)
-def partial_update_post(post_id: int, post: PostCreate):
+def partial_update_post(post_id: int, post: PostCreate) -> dict[str, object]:
+    """Update and return the supplied fields of an existing post."""
     if post_id not in text_posts:
         raise HTTPException(status_code=404, detail="Post not found")
 
     existing_post = text_posts[post_id]
     updated_post = {
         "title": post.title if post.title else existing_post["title"],
-        "content": post.content if post.content else existing_post["content"]
+        "content": post.content if post.content else existing_post["content"],
     }
     text_posts[post_id] = updated_post
     return {

@@ -1,16 +1,32 @@
+"""Database models and asynchronous database helpers."""
+
+import os
 import uuid
 from collections.abc import AsyncGenerator
-from datetime import datetime
+from datetime import datetime, timezone
 
+from dotenv import load_dotenv
 from sqlalchemy import Column, DateTime, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
-DATABASE_URL = ""
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite+aiosqlite:///./app.db"
 
 
-class Post(DeclarativeBase):
+# SQLAlchemy declarative classes do not need public methods.
+# pylint: disable=too-few-public-methods
+class Base(DeclarativeBase):
+    """Base class for SQLAlchemy models."""
+
+    pass
+
+
+class Post(Base):
+    """Database model for uploaded posts."""
+
     __tablename__ = "posts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -18,7 +34,7 @@ class Post(DeclarativeBase):
     url = Column(String, nullable=False)
     file_type = Column(String, nullable=False)
     file_name = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
 
 engine = create_async_engine(DATABASE_URL)
@@ -29,10 +45,12 @@ async_session_maker = async_sessionmaker(
 
 
 async def create_db_and_tables():
+    """Create all database tables if they do not already exist."""
     async with engine.begin() as conn:
-        await conn.run_sync(DeclarativeBase.metadata.create_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """Yield an asynchronous database session."""
     async with async_session_maker() as session:
         yield session

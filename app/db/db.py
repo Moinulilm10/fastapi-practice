@@ -13,15 +13,15 @@ from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL") or "sqlite+aiosqlite:///./app.db"
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL must be set to a PostgreSQL connection URL")
 
 
 # SQLAlchemy declarative classes do not need public methods.
 # pylint: disable=too-few-public-methods
 class Base(DeclarativeBase):
     """Base class for SQLAlchemy models."""
-
-    pass
 
 
 class Post(Base):

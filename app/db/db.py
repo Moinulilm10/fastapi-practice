@@ -6,7 +6,8 @@ from collections.abc import AsyncGenerator
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
-from sqlalchemy import Column, DateTime, String, Text
+from fastapi_users_db import SQLAlchemyBaseUserTableUUID, SQLAlchemyUserDatabase
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
@@ -24,12 +25,16 @@ class Base(DeclarativeBase):
     """Base class for SQLAlchemy models."""
 
 
+class User(SQLAlchemyBaseUserTableUUID, Base):
+    posts = relationship("Post", back_populates="user")
+
 class Post(Base):
     """Database model for uploaded posts."""
 
     __tablename__ = "posts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user_id") nullable=False)
     caption = Column(Text)
     url = Column(String, nullable=False)
     file_type = Column(String, nullable=False)
@@ -39,8 +44,11 @@ class Post(Base):
         default=lambda: datetime.now(timezone.utc),
     )
 
+    user = relationship(argument:"User", back_populates="posts")
+
 
 engine = create_async_engine(DATABASE_URL)
+
 async_session_maker = async_sessionmaker(
     engine,
     expire_on_commit=False,
@@ -57,3 +65,7 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     """Yield an asynchronous database session."""
     async with async_session_maker() as session:
         yield session
+
+
+async def get_user_db(session: AsyncSession = Depends(get_async_session):
+    yield SQLAlchemyUserDatabase(session, User)

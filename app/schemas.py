@@ -17,3 +17,10 @@ class ApiResponse(BaseModel):
     status_code: int
     message: str
     data: PostResponse | dict[int, PostResponse] | list[PostResponse] | None = None
+
+
+class DeleteResponse(BaseModel):
+    """Response returned after deleting a post."""
+
+    success: bool
+    message: str

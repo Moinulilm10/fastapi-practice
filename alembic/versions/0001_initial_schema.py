@@ -1,21 +1,29 @@
+# pyright: reportAttributeAccessIssue=false
+# pylint: disable=invalid-name
+
 """Create users and posts tables."""
 
 from collections.abc import Sequence
-from typing import Union
+from typing import Any, Union
 
-from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+
+from alembic import op
 
 revision: str = "0001_initial_schema"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+create_table: Any = getattr(op, "create_table")
+create_index: Any = getattr(op, "create_index")
+drop_table: Any = getattr(op, "drop_table")
+drop_index: Any = getattr(op, "drop_index")
 
 
 def upgrade() -> None:
     """Create the initial application tables."""
-    op.create_table(
+    create_table(
         "user",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("email", sa.String(length=320), nullable=False),
@@ -25,8 +33,8 @@ def upgrade() -> None:
         sa.Column("is_verified", sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index("ix_user_email", "user", ["email"], unique=True)
-    op.create_table(
+    create_index("ix_user_email", "user", ["email"], unique=True)
+    create_table(
         "posts",
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("user_id", postgresql.UUID(as_uuid=True), nullable=False),
@@ -42,6 +50,6 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Drop the initial application tables."""
-    op.drop_table("posts")
-    op.drop_index("ix_user_email", table_name="user")
-    op.drop_table("user")
+    drop_table("posts")
+    drop_index("ix_user_email", table_name="user")
+    drop_table("user")

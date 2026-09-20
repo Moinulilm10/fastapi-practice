@@ -1,5 +1,8 @@
 """Pydantic schemas used by the API."""
 
+import uuid
+
+from fastapi_users import schemas
 from pydantic import BaseModel
 
 
@@ -30,3 +33,15 @@ class DeleteResponse(BaseModel):
 
     success: bool
     message: str
+
+
+class UserRead(schemas.BaseUser[uuid.UUID]):
+    """Public user fields returned by the authentication API."""
+
+
+class UserCreate(schemas.BaseUserCreate):
+    """Fields accepted when registering a new user."""
+
+
+class UserUpdate(schemas.BaseUserUpdate):
+    """Fields accepted when updating an existing user."""

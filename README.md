@@ -27,3 +27,25 @@ DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/fastapi_
 ```
 
 Keep `.env` local and do not commit database passwords or other secrets.
+
+## Database migrations
+
+Alembic manages PostgreSQL schema changes. Apply migrations with:
+
+```bash
+uv run alembic upgrade head
+```
+
+After changing a SQLAlchemy model, create a migration:
+
+```bash
+uv run alembic revision --autogenerate -m "describe the change"
+uv run alembic upgrade head
+```
+
+If the existing database was created before Alembic was added, mark it as
+matching the initial migration once, without recreating its tables:
+
+```bash
+uv run alembic stamp head
+```

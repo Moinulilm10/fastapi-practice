@@ -22,6 +22,10 @@ services:
     command: /app/.venv/bin/uvicorn app.app:app --host 0.0.0.0 --port 8000 --reload
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/${POSTGRES_DB:-fastapi_practice}
+      IMAGEKIT_PRIVATE_KEY: ${IMAGEKIT_PRIVATE_KEY:?Set IMAGEKIT_PRIVATE_KEY in .env}
+      IMAGEKIT_PUBLIC_KEY: ${IMAGEKIT_PUBLIC_KEY:-}
+      IMAGEKIT_URL: ${IMAGEKIT_URL:-}
+      SECRET: ${SECRET:?Set SECRET in .env}
     ports:
       - "8000:8000"
     depends_on:

@@ -8,13 +8,21 @@ For Docker Compose, copy `.env.example` to `.env` and set a private password:
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=replace_with_a_private_password
 POSTGRES_DB=fastapi_practice
+IMAGEKIT_PRIVATE_KEY=replace_with_your_imagekit_private_key
+IMAGEKIT_PUBLIC_KEY=replace_with_your_imagekit_public_key
+IMAGEKIT_URL=https://ik.imagekit.io/your_imagekit_id
+SECRET=replace_with_a_long_random_secret
 ```
 
 Start PostgreSQL and the API:
 
 ```bash
-docker compose up -d
+make up
 ```
+
+This builds the API image when needed and starts both containers in the
+background. To follow the application and database logs, run `make logs`.
+Stop the project with `make down`.
 
 The application creates the tables during startup. The Compose file builds the
 internal `DATABASE_URL` from the private variables in `.env`; credentials are

@@ -53,6 +53,15 @@ http://localhost:8501
 
 Inside Compose, the frontend connects to FastAPI using the `api` service name.
 
+Run the frontend unit, component, and API integration tests with:
+
+```bash
+uv run pytest \
+	tests/test_frontend_unit.py \
+	tests/test_frontend_component.py \
+	tests/test_frontend_integration.py
+```
+
 ## Database migrations
 
 Alembic manages PostgreSQL schema changes. Apply migrations with:

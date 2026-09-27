@@ -10,10 +10,7 @@ import streamlit as st
 API_BASE_URL = os.getenv("FASTAPI_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 REQUEST_TIMEOUT = 30
 
-st.set_page_config(page_title="Open Frame", layout="wide")
-
-st.markdown(
-    """
+PAGE_STYLES = """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
     :root {
@@ -104,9 +101,13 @@ st.markdown(
         border-radius: 6px;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+"""
+
+
+def configure_page() -> None:
+    """Set the Streamlit page layout and apply the app styles."""
+    st.set_page_config(page_title="Open Frame", layout="wide")
+    st.markdown(PAGE_STYLES, unsafe_allow_html=True)
 
 
 def api_request(
@@ -387,7 +388,14 @@ def render_dashboard() -> None:
         render_feed()
 
 
-if "access_token" in st.session_state:
-    render_dashboard()
-else:
-    render_authentication()
+def main() -> None:
+    """Render the authenticated dashboard or sign-in page."""
+    configure_page()
+    if "access_token" in st.session_state:
+        render_dashboard()
+    else:
+        render_authentication()
+
+
+if __name__ == "__main__":
+    main()

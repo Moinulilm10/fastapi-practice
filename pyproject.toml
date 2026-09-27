@@ -29,6 +29,7 @@ module-root = "."
 
 [dependency-groups]
 dev = [
+    "aiosqlite>=0.21.0",
     "pytest>=9.1.1",
 ]
 

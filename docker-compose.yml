@@ -61,6 +61,26 @@ services:
         - action: rebuild
           path: ./uv.lock
 
+  frontend:
+    build: .
+    image: fast-api-practice-frontend
+    container_name: fastapi-frontend
+    command:
+      - /app/.venv/bin/python
+      - -m
+      - streamlit
+      - run
+      - frontend.py
+      - --server.address=0.0.0.0
+      - --server.port=8501
+      - --server.headless=true
+    environment:
+      FASTAPI_BASE_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
   pgadmin_data:

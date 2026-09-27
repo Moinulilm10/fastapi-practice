@@ -10,11 +10,13 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 COPY pyproject.toml uv.lock* README.md ./
+COPY .streamlit ./.streamlit
 COPY app ./app
+COPY frontend.py ./frontend.py
 COPY main.py ./main.py
 
 RUN uv sync --no-dev
 
-EXPOSE 8000
+EXPOSE 8000 8501
 
 CMD ["uv", "run", "uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "8000"]

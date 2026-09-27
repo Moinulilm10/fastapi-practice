@@ -22,9 +22,9 @@ Start PostgreSQL, the API, and pgAdmin:
 make up
 ```
 
-This builds the API image when needed and starts both containers in the
-background. To follow the application and database logs, run `make logs`.
-Stop the project with `make down`.
+This builds the application images when needed and starts PostgreSQL, the API,
+pgAdmin, and the Streamlit frontend in the background. To follow their logs,
+run `make logs`. Stop the project with `make down`.
 
 Open pgAdmin at `http://localhost:5050` and sign in with the pgAdmin email and
 password from `.env`. Register a server with host `db`, port `5432`, and the
@@ -41,6 +41,17 @@ DATABASE_URL=postgresql+asyncpg://postgres:your_password@localhost:5432/fastapi_
 ```
 
 Keep `.env` local and do not commit database passwords or other secrets.
+
+## Streamlit frontend
+
+The frontend runs in Docker Compose alongside the API. Start the services with
+`make up`, then open:
+
+```text
+http://localhost:8501
+```
+
+Inside Compose, the frontend connects to FastAPI using the `api` service name.
 
 ## Database migrations
 

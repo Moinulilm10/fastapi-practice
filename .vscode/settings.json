@@ -1,15 +1,18 @@
 {
-    "python.REPL.enableREPLSmartSend": false,
-    "sqltools.connections": [
-        {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "localhost",
-            "driver": "PostgreSQL",
-            "name": "fastapi_practice",
-            "connectString": "postgresql+asyncpg://postgres:fastapi123456@localhost:5432/fastapi_practice",
-            "database": "fastapi_practice",
-            "username": "postgres"
-        }
-    ]
+  "python.REPL.enableREPLSmartSend": false,
+  "terminal.integrated.env.linux": {
+    "GH_CONFIG_DIR": "${workspaceFolder}/.gh-config"
+  },
+  "sqltools.connections": [
+    {
+      "ssh": "Disabled",
+      "previewLimit": 50,
+      "server": "localhost",
+      "driver": "PostgreSQL",
+      "name": "fastapi_practice",
+      "connectString": "postgresql+asyncpg://postgres:fastapi123456@localhost:5432/fastapi_practice",
+      "database": "fastapi_practice",
+      "username": "postgres"
+    }
+  ]
 }

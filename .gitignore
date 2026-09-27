@@ -13,3 +13,6 @@ wheels/
 .env
 .env.*
 !.env.example
+
+# Project-scoped GitHub CLI credentials
+.gh-config/

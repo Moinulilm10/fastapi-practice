@@ -8,7 +8,7 @@ For Docker Compose, copy `.env.example` to `.env` and set a private password:
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=replace_with_a_private_password
 POSTGRES_DB=fastapi_practice
-PGADMIN_DEFAULT_EMAIL=admin@fastapi.local
+PGADMIN_DEFAULT_EMAIL=admin@pgadmin.org
 PGADMIN_DEFAULT_PASSWORD=replace_with_a_private_pgadmin_password
 IMAGEKIT_PRIVATE_KEY=replace_with_your_imagekit_private_key
 IMAGEKIT_PUBLIC_KEY=replace_with_your_imagekit_public_key

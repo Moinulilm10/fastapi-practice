@@ -11,12 +11,10 @@ from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.db import Post, create_db_and_tables, get_async_session
+from app.db.db import Post, User, create_db_and_tables, get_async_session
 from app.images import image_kit
 from app.schemas import (
     DeleteResponse,
-    PostCreate,
-    PostResponse,
     UserCreate,
     UserRead,
     UserUpdate,
@@ -58,6 +56,7 @@ app.include_router(
 async def upload_file(
     file: UploadFile = File(...),
     caption: str = Form(""),
+    user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session),
 ) -> dict[str, object]:
     """Upload a file to ImageKit and save its metadata."""
@@ -94,6 +93,7 @@ async def upload_file(
             else "image"
         )
         post = Post(
+            user_id=user.id,
             caption=caption,
             url=url,
             file_type=file_type,
@@ -125,10 +125,15 @@ async def upload_file(
 @app.get("/feed")
 async def get_feed(
     session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
 ) -> dict[str, list[dict[str, Any]]]:
     """Retrieve all posts from the database."""
     result = await session.execute(select(Post).order_by(Post.created_at.desc()))
     posts = result.scalars().all()
+
+    result = await session.execute(select(User))
+    users = [row[0] for row in result.all()]
+    user_dict = {u.id: u.email for u in users}
 
     post_data: list[dict[str, Any]] = []
 
@@ -136,11 +141,14 @@ async def get_feed(
         post_data.append(
             {
                 "id": str(post.id),
+                "user_id": str(post.user_id),
                 "caption": post.caption,
                 "url": post.url,
                 "file_type": post.file_type,
                 "file_name": post.file_name,
                 "created_at": post.created_at.isoformat(),
+                "is_owner": post.user_id == user.id,
+                "email": user_dict.get(post.user_id, "Unknown"),
             }
         )
 
@@ -149,7 +157,9 @@ async def get_feed(
 
 @app.delete("/posts/{post_id}")
 async def delete_post(
-    post_id: str, session: AsyncSession = Depends(get_async_session)
+    post_id: str,
+    session: AsyncSession = Depends(get_async_session),
+    user: User = Depends(current_active_user),
 ) -> DeleteResponse:
     """Delete a post by its ID."""
     try:
@@ -160,6 +170,11 @@ async def delete_post(
 
         if not post:
             raise HTTPException(status_code=404, detail="Post not found")
+
+        if post.user_id != user.id:
+            raise HTTPException(
+                status_code=403, detail="You don't have permission to delete this post"
+            )
 
         await session.delete(post)
         await session.commit()

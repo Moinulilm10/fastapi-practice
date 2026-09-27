@@ -14,7 +14,7 @@ from fastapi_users_db_sqlalchemy import (
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 load_dotenv()
 
@@ -41,7 +41,9 @@ class Post(Base):
     __tablename__ = "posts"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user.id"), nullable=False
+    )
     caption = Column(Text)
     url = Column(String, nullable=False)
     file_type = Column(String, nullable=False)

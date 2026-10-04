@@ -62,6 +62,18 @@ uv run pytest \
 	tests/test_frontend_integration.py
 ```
 
+## Browser tests
+
+Playwright and its pytest plugin are included in the development dependencies.
+Install Chromium once for the current machine, then use the `page` fixture in
+browser tests:
+
+```bash
+uv sync
+uv run playwright install chromium
+uv run pytest
+```
+
 ## Database migrations
 
 Alembic manages PostgreSQL schema changes. Apply migrations with:

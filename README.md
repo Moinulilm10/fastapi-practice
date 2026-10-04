@@ -74,6 +74,22 @@ uv run playwright install chromium
 uv run pytest
 ```
 
+## End-to-end browser tests
+
+The project includes a real browser flow that validates the production stack from
+UI to API. The test requires the Docker services to be running and browses the
+Streamlit application at `http://127.0.0.1:8501`.
+
+Start the app stack and execute the browser test with:
+
+```bash
+make e2e
+```
+
+This target boots the PostgreSQL database, API, and Streamlit frontend, then runs
+`tests/test_e2e_frontend.py` with the `e2e` marker. The test covers the account
+creation flow and sign-out flow that a user experiences in the browser.
+
 ## Database migrations
 
 Alembic manages PostgreSQL schema changes. Apply migrations with:

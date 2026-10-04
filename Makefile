@@ -1,4 +1,4 @@
-.PHONY: up down restart logs build print-urls
+.PHONY: up down restart logs build print-urls e2e e2e-headed e2e-down
 
 up:
 	docker compose up --build -d
@@ -20,3 +20,14 @@ logs:
 
 build:
 	docker compose build
+
+e2e:
+	docker compose up --build -d db api frontend
+	uv run pytest tests/test_e2e_frontend.py -m e2e
+
+e2e-headed:
+	docker compose up --build -d db api frontend
+	uv run pytest tests/test_e2e_frontend.py -m e2e --headed
+
+e2e-down:
+	docker compose down

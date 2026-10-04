@@ -17,6 +17,8 @@ dependencies = [
     "requests>=2.32.0",
     "streamlit>=1.0",
     "uvicorn[standard]>=0.52.4",
+    "httpx2>=2.13.1",
+    "anyio<4.15",
 ]
 
 [build-system]
@@ -33,6 +35,11 @@ dev = [
     "playwright>=1.63.0",
     "pytest>=9.1.1",
     "pytest-playwright>=0.9.0",
+]
+
+[tool.pytest.ini_options]
+markers = [
+    "e2e: end-to-end browser tests that require the app stack to be running",
 ]
 
 [tool.uv]
